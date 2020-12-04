@@ -15,8 +15,8 @@ parameters {
   vector[3] beta;
   real mu_alpha;
   real mu_beta;
-  real mu_sigma;
-  real sd_sigma;
+  real mu_sd;
+  real sigma_sd;
   real sigma_alpha;
   real sigma_beta;
   vector[3] sigma;
@@ -31,7 +31,7 @@ transformed parameters {
 
 model {
   //  priors
-  mu_sigma~ normal(0,2);
+  mu_sd~ normal(0,2);
   sd_sigma ~ inv_chi_square(0.1);
   mu_alpha ~ normal(0,2); 
   mu_beta ~ normal(0,2); 
