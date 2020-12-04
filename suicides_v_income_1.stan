@@ -15,8 +15,7 @@ parameters {
   vector[3] beta;
   real mu_alpha;
   real mu_beta;
-  real sigma_alpha;
-  real sigma_beta;
+  real sigma_hyp;
   real <lower=0> sigma;
 }
 
@@ -32,22 +31,21 @@ model {
   //  priors
   mu_alpha ~ normal(0,2); 
   mu_beta ~ normal(0,2); 
-  sigma_alpha ~ inv_chi_square(0.1); 
-  sigma_beta ~ inv_chi_square(0.1); 
+  sigma_hyp ~ inv_chi_square(0.1); 
   
   
-  alpha[1] ~ normal(mu_alpha, sigma_alpha); 
-  beta[1] ~ normal(mu_beta, sigma_beta); 
+  alpha[1] ~ normal(mu_alpha, sigma_hyp); 
+  beta[1] ~ normal(mu_beta, sigma_hyp); 
   y1 ~ normal(mu1, sigma);
   
   
-  alpha[2] ~ normal(mu_alpha, sigma_alpha); 
-  beta[2] ~ normal(mu_beta, sigma_beta); 
+  alpha[2] ~ normal(mu_alpha, sigma_hyp); 
+  beta[2] ~ normal(mu_beta, sigma_hyp); 
   y2 ~ normal(mu2, sigma);
   
   
-  alpha[3] ~ normal(mu_alpha, sigma_alpha); 
-  beta[3] ~ normal(mu_beta, sigma_beta); 
+  alpha[3] ~ normal(mu_alpha, sigma_hyp); 
+  beta[3] ~ normal(mu_beta, sigma_hyp); 
   y3 ~ normal(mu3, sigma);  
   
  // theta[J+1] ~ normal(mu, sigma_p); // Getting the mean for the seventh machine
