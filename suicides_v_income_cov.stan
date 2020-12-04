@@ -16,8 +16,8 @@ parameters {
   vector[2] theta3;
   vector[2] mu_theta;
   corr_matrix[2] sig_cov;
-  real sig_scale_alpha;
-  real sig_scale_beta;
+  real <lower=0> sig_scale_alpha;
+  real <lower=0> sig_scale_beta;
   real <lower=0> sigma;
 }
 

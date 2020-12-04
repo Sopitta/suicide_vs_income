@@ -2,8 +2,8 @@ library(rstan)
 library(shinystan)
 library(loo)
 
-#setwd("C:/Users/SopittaT/Desktop/Fall2020/BDA/Project/Data")
-setwd("~/Documents/work/bda/project")
+setwd("C:/Users/SopittaT/Desktop/Fall2020/BDA/Project/suicide_v_income")
+#setwd("~/Documents/work/bda/project")
 
 ukdata =read.csv('UKdata.csv');
 usdata =read.csv('USdata.csv');
@@ -12,11 +12,10 @@ countrydata =read.csv('countrydata.csv')
 
 #file_name = "suicides_v_income.stan"
 file_name = "suicides_v_income_cov.stan"
-
 sm_suicide <- rstan::stan_model(file = file_name)
 
 stan_data <- list(y1 = ukdata$suicides100k, x1=ukdata$wagepercol, N1 = length(ukdata$wagepercol), y2 = usdata$suicides100k, x2=usdata$wagepercol, N2 = length(usdata$wagepercol), y3 = countrydata$suicides100k, x3=countrydata$wagepercol, N3 = length(countrydata$wagepercol))
-model_hier <- rstan::sampling(sm_suicide, data = stan_data, seed = 2,control=list(adapt_delta=0.95))
+model_hier <- rstan::sampling(sm_suicide, data = stan_data, seed = 3,control=list(adapt_delta=0.95))
 
 
 draws_hier <- as.data.frame(model_hier)
