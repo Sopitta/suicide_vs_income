@@ -32,7 +32,8 @@ model {
   mu_alpha ~ normal(0,2); 
   mu_beta ~ normal(0,2); 
   sigma_hyp ~ inv_chi_square(0.1); 
-  
+  sigma ~ gamma(1,1);
+
   
   alpha[1] ~ normal(mu_alpha, sigma_hyp); 
   beta[1] ~ normal(mu_beta, sigma_hyp); 

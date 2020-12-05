@@ -32,7 +32,7 @@ transformed parameters {
 model {
   //  priors
   mu_sd~ normal(0,2);
-  sd_sigma ~ inv_chi_square(0.1);
+  sigma_sd ~ gamma(1, 1);
   mu_alpha ~ normal(0,2); 
   mu_beta ~ normal(0,2); 
    
@@ -43,7 +43,7 @@ model {
   sigma_beta ~ inv_chi_square(0.1); 
   
   for (i in 1:3){
-    sigma[i] ~ normal(mu_beta, sigma_beta);
+    sigma[i] ~ normal(mu_sd, sigma_sd);
   } 
   
   

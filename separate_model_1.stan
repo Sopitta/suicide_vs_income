@@ -25,10 +25,12 @@ transformed parameters {
 
 model {
   //  priors
-  for (i in 1:3)
+  for (i in 1:3){
     alpha[i] ~ normal(0, 3); 
     beta[i] ~ normal(0, 3); 
+  }
   
+  sigma ~ gamma(1,1);
   
   for (n in 1:N1){
     y1[n] ~ normal(mu1[n], sigma);

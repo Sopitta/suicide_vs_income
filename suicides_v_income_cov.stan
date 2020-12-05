@@ -30,6 +30,7 @@ transformed parameters {
 
 
 model {
+  sigma = gamma(1,1);
   sig_cov ~ lkj_corr(2);
   sig_scale ~  multi_normal([10,10], [[100,10],[10,100]]) ;
   mu_theta ~ multi_normal([10,10], [[100,10],[10,100]]) ;

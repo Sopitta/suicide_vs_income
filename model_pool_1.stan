@@ -19,7 +19,8 @@ model {
   //  priors
   alpha ~ normal(0, 3); 
   beta ~ normal(0, 3); 
-  
+  sigma ~ gamma(1,1);
+
   
   for (n in 1:N){
     y[n] ~ normal(mu[n], sigma);
