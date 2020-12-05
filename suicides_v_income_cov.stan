@@ -16,13 +16,13 @@ parameters {
   vector[2] theta3;
   vector[2] mu_theta;
   corr_matrix[2] sig_cov;
-  real <lower=0> sig_scale_alpha;
-  real <lower=0> sig_scale_beta;
+  vector<lower=0>[2] sig_scale;
   real <lower=0> sigma;
 }
 
 transformed parameters {
-  matrix[2,2] sig_hyp = [[sig_scale_alpha, sqrt(sig_scale_alpha*sig_scale_beta)*sig_cov[1,2]], [sqrt(sig_scale_beta*sig_scale_alpha)*sig_cov[2,1], sig_scale_beta]]; 
+ // matrix[2,2] sig_hyp = [[sig_scale_areal <lower=0>lpha, sqrt(sig_scale_alpha*sig_scale_beta)*sig_cov[1,2]], [sqrt(sig_scale_beta*sig_scale_alpha)*sig_cov[2,1], sig_scale_beta]]; 
+  matrix[2,2] sig_hyp = diag_matrix(sig_scale)*sig_cov*diag_matrix(sig_scale);
   vector[N1] mu1 = theta1[1] +theta1[2]*x1;
   vector[N2] mu2 = theta2[1] +theta2[2]*x2;
   vector[N3] mu3 = theta3[1] +theta3[2]*x3;
@@ -30,7 +30,8 @@ transformed parameters {
 
 
 model {
-  sig_cov ~ lkj_corr(0.5);
+  sig_cov ~ lkj_corr(2);
+  sig_scale ~  multi_normal([10,10], [[100,10],[10,100]]) ;
   mu_theta ~ multi_normal([10,10], [[100,10],[10,100]]) ;
 
   theta1 ~ multi_normal(mu_theta, sig_hyp); 
