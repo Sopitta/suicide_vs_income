@@ -14,7 +14,7 @@ data {
 parameters {
   vector[3] alpha;
   vector[3] beta;
-  real <lower=0> sigma;
+  vector <lower=0>[3] sigma;
 }
 
 transformed parameters {
@@ -26,22 +26,23 @@ transformed parameters {
 model {
   //  priors
   for (i in 1:3){
-    alpha[i] ~ normal(0, 3); 
-    beta[i] ~ normal(0, 3); 
+    alpha[i] ~ normal(0, 50); 
+    beta[i] ~ normal(0, 50); 
+    sigma[i] ~ gamma(1,1);
+
   }
   
-  sigma ~ gamma(1,1);
   
   for (n in 1:N1){
-    y1[n] ~ normal(mu1[n], sigma);
+    y1[n] ~ normal(mu1[n], sigma[1]);
   } 
   
   for (n in 1:N2){
-    y2[n] ~ normal(mu2[n], sigma);
+    y2[n] ~ normal(mu2[n], sigma[2]);
   } 
   
   for (n in 1:N3){
-    y3[n] ~ normal(mu3[n], sigma);
+    y3[n] ~ normal(mu3[n], sigma[3]);
   } 
 }
 
@@ -52,13 +53,13 @@ generated quantities {
   
   
   for (n in 1:N1){
-    log_lik1[n] = normal_lpdf(y1[n] | mu1[n], sigma);
+    log_lik1[n] = normal_lpdf(y1[n] | mu1[n], sigma[1]);
   } 
   for (n in 1:N2){
-    log_lik2[n] = normal_lpdf(y2[n] | mu2[n], sigma);
+    log_lik2[n] = normal_lpdf(y2[n] | mu2[n], sigma[2]);
   } 
   for (n in 1:N3){
-    log_lik3[n] = normal_lpdf(y3[n] | mu3[n], sigma);
+    log_lik3[n] = normal_lpdf(y3[n] | mu3[n], sigma[3]);
   } 
  }
 

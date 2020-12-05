@@ -19,7 +19,7 @@ parameters {
   vector<lower=0>[2] sig_scale;
   vector<lower=0>[3] sigma;
   real mu_sd;
-  real sigma_sd;
+  real <lower=0> sigma_sd;
 }
 
 transformed parameters {
@@ -32,7 +32,6 @@ transformed parameters {
 
 
 model {
-  sigma ~ gamma(1,1);
   sig_cov ~ lkj_corr(2);
   sig_scale ~  multi_normal([10,10], [[100,10],[10,100]]) ;
   mu_theta ~ multi_normal([10,10], [[100,10],[10,100]]) ;
@@ -66,13 +65,13 @@ generated quantities {
   
   
   for (n in 1:N1){
-    log_lik1[n] = normal_lpdf(y1[n] | mu1[n], sigma);
+    log_lik1[n] = normal_lpdf(y1[n] | mu1[n], sigma[1]);
   } 
   for (n in 1:N2){
-    log_lik2[n] = normal_lpdf(y2[n] | mu2[n], sigma);
+    log_lik2[n] = normal_lpdf(y2[n] | mu2[n], sigma[2]);
   } 
   for (n in 1:N3){
-    log_lik3[n] = normal_lpdf(y3[n] | mu3[n], sigma);
+    log_lik3[n] = normal_lpdf(y3[n] | mu3[n], sigma[3]);
   } 
  }
 

@@ -13,7 +13,8 @@ countrydata =read.csv('countrydata.csv')
 
 
 #file_name = "suicides_v_income.stan"
-file_name = "suicides_v_income_cov.stan"
+#file_name = "separate_model_1.stan"
+file_name = "suicides_v_income_cov2.stan"
 
 sm_suicide <- rstan::stan_model(file = file_name)
 
@@ -22,7 +23,25 @@ model_hier <- rstan::sampling(sm_suicide, data = stan_data, seed = 2,control=lis
 
 
 draws_hier <- as.data.frame(model_hier)
-log_lik  <- data.matrix(draws_hier[(length(draws_hier)-123):(length(draws_hier)-1)]) 
+log_lik  <- data.matrix(draws_hier[(length(draws_hier)-123):(length(draws_hier)-1)]) #Works for all models
+
+
+loo1 <- loo(log_lik)
+print(loo1$estimates[1])
+
+
+###################4
+
+file_name = "model_pool_1.stan"
+
+sm_suicide <- rstan::stan_model(file = file_name)
+
+stan_data <- list(y = c(ukdata$suicides100k, usdata$suicides100k, countrydata$suicides100k), x=c(ukdata$wagepercol, usdata$wagepercol, countrydata$wagepercol), N = 124)
+model_hier <- rstan::sampling(sm_suicide, data = stan_data, seed = 2,control=list(adapt_delta=0.95))
+
+
+draws_hier <- as.data.frame(model_hier)
+log_lik  <- data.matrix(draws_hier[(length(draws_hier)-123):(length(draws_hier)-1)]) #Works for all models
 
 
 loo1 <- loo(log_lik)
