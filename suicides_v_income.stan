@@ -34,7 +34,7 @@ model {
   mu_beta ~ normal(0,2); 
   sigma_alpha ~ inv_chi_square(0.1); 
   sigma_beta ~ inv_chi_square(0.1); 
-  
+  sigma ~ gamma(1,1)
   
   alpha[1] ~ normal(mu_alpha, sigma_alpha); 
   beta[1] ~ normal(mu_beta, sigma_beta); 
