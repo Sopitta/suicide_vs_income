@@ -15,7 +15,6 @@ k_vals = integer(1,2,3,4)
 
 file_names = c("Model_1.stan", "Model_2.stan", "Model_3.stan")
 
-
 i=1;
 for(file_name in file_names)
 {sm_suicide <- rstan::stan_model(file = file_name)
@@ -33,6 +32,9 @@ print(loo1$estimates[1])
 loo_vals[i]=loo1;
 k_vals[i] = max(loo1$diagnostics$pareto_k); 
 i=i+1;
+
+
+
 }
 ###################4k_vals
 
