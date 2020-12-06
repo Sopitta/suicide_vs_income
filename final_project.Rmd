@@ -20,6 +20,9 @@ The relationship between the mean income and the suicide rate was modeled as a l
 
 The US data was examined by the website registerednursing.org, and a single linear trend was fitted with no statistical information or information about the methods. Reviewing past academic publication reveals that similar studies were done with the data in previous years for South Korea [1] and Denmark [2]. The former calculated the suicide hazard ratios for each income bracket to a certain confidence level, while the latter included more factors in the analysis such as age and gender, transforming the problem. 
 
+## Layout of the report
+
+The report commences with explaining the data used for the analysis. After this, the different models that are applied are explained, and then their respective performances are analyzed in terms of convergence and how well they fit the data. Some different priors are hyper priors are tested in a sensitivity analysis, and finally, the results are interpreted with our overall conclusion.
 
 # The data 
 
@@ -84,9 +87,76 @@ This is the most complicated context in which this relationship is examined. It 
 
 # Methodology
 
+## Models used 
+
+The standardized monthly income and the suicide rates are modeled together as a linear regression problem, such that the mean of the suicide rate R for a particular income level I would be given by $R = \alpha + \beta I$. The values of $\alpha$ and $\beta$ for this purpose are output through the written Stan codes. For this modeling problem, a few kinds of linear regression models were tested. 
+
+First, hierarchical models are tested. A common $\sigma^2$ is used for all three contexts, with weakly informative priors. The values of $\alpha$ and $\beta$ are drawn from hyperpriors common to all contexts. This is depicted by the first image below.
+
+The second kind of hierarchical model assumes that there is a correlation between $\alpha$ and $\beta$ and therefore the hyperpriors for the two have a vector $\mu$ and a covariance matrix $\Sigma$. Generation of a covariance priors from the hyperpriors requires the separate generation of the correlation matrix $\Sigma_0$ (using the LKJ correlation distribution) and the scaling factor $\sigma_\alpha$ and $\sigma_\beta$. A diagonal matrix D is generated from the two $\sigma$s, and then the covariance matrix is obtained as a transformed parameter as $\Sigma = D\times\Sigma_0\times D$. This model is depicted in the second figure below.
+
+The two hierarchical models are compared with both pooled and separate models, which have priors defined for $\alpha$ and $\beta$ as well as for $\sigma^2$. For the pooled model, a single estimate is made for $\alpha$, $\beta$ and for $\sigma^2$ on combining the data from all three contexts. For the separate model, three completely separate estimates are made for each of the contexts for $\alpha$, $\beta$ and for $\sigma^2$. The model layout for both pooled and separate modes look similar, and is depicted as the third figure below. 
+
+![First Hierarchical model](hier-separate-alphabeta.png){width=200px} ![Second Hierarchical model](hier_cov-singlesig.png){width=200px} ![Separate and pooled models](hier-separate-pool.png){width=200px}
+
+
+
+
+To summarize, the four models tested are: 
+
+- Hierarchical model with uncorrelated $\alpha$ and $\beta$ (Figure 1)
+- Hierarchical model with correlated $\alpha$ and $\beta$. (Figure 2)
+- Separate model (Figure 3)
+- Pooled model (Figure 3)
+
+
+## Sensitivity analysis
+
+### Separate model
+
+To test the prior sensitivity, we change $\alpha$ and $\beta$ prior as following
+
+**Experiment1**
+
+$\begin{bmatrix}\alpha \\\beta\end{bmatrix}=\begin{bmatrix}0 \\0\end{bmatrix}$ and $\sum=\begin{bmatrix}15^2&67.5 \\67.5&15^2\end{bmatrix}$ 
+ 
+**Result:** 
+
+All Rhat values = 1, elpd_loo = -396.4, 122 k-values are between (-Inf, 0.5] (good) and 2 k-values are in (0.7, 1] (bad)
+
+**Experiment2**
+
+$\begin{bmatrix}\alpha \\\beta\end{bmatrix}=\begin{bmatrix}2 \\2\end{bmatrix}$ and $\sum=\begin{bmatrix}3^2&9 \\9&3^2\end{bmatrix}$ 
+ 
+**Result:**
+All Rhat values = 1, elpd_loo = -401.4, 121 k-values are between (-Inf, 0.5] (good),1 k-value is in  (0.5, 0.7] and 1 k-value is in (0.7, 1] (bad)
+
+### Pool model
+
+To test the prior sensitivity, we change $\alpha$ and $\beta$ prior as following
+
+**Experiment1**
+
+$\begin{bmatrix}\alpha \\\beta\end{bmatrix}=\begin{bmatrix}0 \\0\end{bmatrix}$ and $\sum=\begin{bmatrix}15^2&67.5 \\67.5&15^2\end{bmatrix}$ 
+ 
+**Result:** 
+
+All Rhat values = 1, elpd_loo = -431.3, 122 k-values are between (-Inf, 0.5] (good) and 1 k-value is in (0.7, 1] (bad)
+
+**Experiment2**
+
+$\begin{bmatrix}\alpha \\\beta\end{bmatrix}=\begin{bmatrix}2 \\2\end{bmatrix}$ and $\sum=\begin{bmatrix}3^2&9 \\9&3^2\end{bmatrix}$ 
+ 
+**Result:**
+All Rhat values = 1, elpd_loo = -431.7, 121 k-values are between (-Inf, 0.5] (good), 1 k-value is in (0.7, 1] (bad)
+
+
+
+
 
 
 # References: 
 [1] Qin, Ping, Esben Agerbo, and Preben Bo Mortensen. "Suicide risk in relation to socioeconomic, demographic, psychiatric, and familial factors: a national register–based study of all suicides in Denmark, 1981–1997." American journal of psychiatry 160.4 (2003): 765-772.
+
 [2] Lee, Sang-Uk, et al. "Suicide rates across income levels: retrospective cohort data on 1 million participants collected between 2003 and 2013 in South Korea." Journal of epidemiology 27.6 (2017): 258-264.
 
