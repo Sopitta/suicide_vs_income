@@ -158,48 +158,58 @@ writeLines(readLines(file_name4))
 
 ## Sensitivity analysis
 
+### Model 1: Hierarchical model, uncorrelated parameters
+
+|   | Hyper-Priors and priors                                                                                                                                           | Good k-vals | Ok k-vals | Bad k-vals | ELPD-LOO  |
+|---|-------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|-----------|------------|-----------|
+| 1 | $\mu_\alpha$ ~ normal(10, 100),   $\mu_\beta$ ~ normal(1,100),   sigma_alpha ~ gamma(1, 1),   $\sigma^2_\beta$ ~ gamma(1, 1),  $\sigma$ ~ gamma(1, 1) |         118 |         1 |          4 | -425.0029 |
+| 2 | $\mu_\alpha$ ~ normal(0, 10), $\mu_\beta$ ~ normal(0,10), sigma_alpha ~ gamma(1, 1),   $\sigma^2_\beta$ ~ gamma(1, 1),  $\sigma$ ~ gamma(1, 1)        |         122 |         1 |          0 | -425.2139 |
+| 3 | $\mu_\alpha$ ~ normal(10, 100), $\mu_\beta$ ~  normal(1,100), sigma_alpha ~ gamma(4, 4),   $\sigma^2_\beta$ ~  gamma(4, 4), $\sigma$ ~ gamma(4, 1)    |         122 |         1 |          0 | -424.6055 |
+| 4 | $\mu_\alpha$ ~ normal(0, 10), $\mu_\beta$ ~ normal(0,10), sigma_alpha ~  gamma(4, 4),   $\sigma^2_\beta$ ~ gamma(4, 4), $\sigma$ ~ gamma(4, 4)        |         123 |         0 |          0 | -424.4974 |
+
+### Model 2: Hierarchical model, correlated parameters
+
+|   | Hyper-Priors and priors                                                                                                                                                                 | Good k-vals | Ok k-vals | Bad k-vals | ELPD-LOO  |
+|---|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|-----------|------------|-----------|
+| 1 |   $\sigma$ ~ gamma(1,1), $\Sigma_0$ ~ lkj_corr(2),  $\sigma_s$ ~  multi_normal([0,1], [100,10],[10,100]]),  $\mu_\theta$ ~ multi_normal([10,0], [[100,10],[10,100]])   |         122 |         1 |          0 | -423.1688 |
+| 2 |   $\sigma$ ~ gamma(4,4), $\Sigma_0$ ~ lkj_corr(0.5),  $\sigma_s$ ~  multi_normal([0,2], [20,10],[10,20]]),  $\mu_\theta$ ~ multi_normal([2,0], [[20,10],[10,20]])      |         114 |         3 |          6 | -425.5915 |
+| 3 |   $\sigma$ ~ gamma(2,2), $\Sigma_0$ ~ lkj_corr(0.25),  $\sigma_s$ ~  multi_normal([2,5], [100,10],[10,100]]),  $\mu_\theta$ ~ multi_normal([5,2], [[100,30],[30,100]]) |         122 |         1 |          0 | -423.5076 |
+| 4 |   $\sigma$ ~ gamma(1,1), $\Sigma_0$ ~ lkj_corr(0.75),  $\sigma_s$ ~  multi_normal([2,20], [20,10],[10,20]]),  $\mu_\theta$ ~ multi_normal([20,20], [[20,10],[10,20]])  |         123 |         0 |          0 | -422.6902 |
+
+
+
 ### Model 3: Separate model
 
-To test the prior sensitivity, we change $\alpha$ and $\beta$ prior as following
+|   | Priors                                                                               | Good k-vals | Ok k-vals | Bad k-vals | ELPD-LOO  |
+|---|--------------------------------------------------------------------------------------|-------------|-----------|------------|-----------|
+| 1 | $\sigma$ ~ gamma(1,1), $\alpha,\beta$ ~ multi_normal([10, 0], [[100,10],[10,100]]);  |         122 |         1 |          0 | -419.4907 |
+| 2 | $\sigma$ ~ gamma(4,4), $\alpha,\beta$ ~ multi_normal([50, 2], [[50,20],[20,50]]);    |         122 |         1 |          0 | -439.7526 |
+| 3 | $\sigma$ ~ gamma(0.5,0.5), $\alpha,\beta$ ~ multi_normal([5, 2], [[50,10],[10,50]]); |         123 |         0 |          0 | -419.4101 |
+| 4 | $\sigma$ ~ gamma(2,2), $\alpha,\beta$ ~ multi_normal([10, 0], [[100,5],[5,100]]);    |         121 |         1 |          1 | -421.8027 |
 
-**Experiment1**
 
-$\begin{bmatrix}\alpha \\\beta\end{bmatrix}=\begin{bmatrix}0 \\0\end{bmatrix}$ and $\sum=\begin{bmatrix}15^2&67.5 \\67.5&15^2\end{bmatrix}$ 
- 
-**Result:** 
-
-All Rhat values = 1, elpd_loo = -396.4, 122 k-values are between (-Inf, 0.5] (good) and 2 k-values are in (0.7, 1] (bad)
-
-**Experiment2**
-
-$\begin{bmatrix}\alpha \\\beta\end{bmatrix}=\begin{bmatrix}2 \\2\end{bmatrix}$ and $\sum=\begin{bmatrix}3^2&9 \\9&3^2\end{bmatrix}$ 
- 
-**Result:**
-All Rhat values = 1, elpd_loo = -401.4, 121 k-values are between (-Inf, 0.5] (good),1 k-value is in  (0.5, 0.7] and 1 k-value is in (0.7, 1] (bad)
 
 ### Model 4: Pooled model
 
-To test the prior sensitivity, we change $\alpha$ and $\beta$ prior as following
-
-**Experiment1**
-
-$\begin{bmatrix}\alpha \\\beta\end{bmatrix}=\begin{bmatrix}0 \\0\end{bmatrix}$ and $\sum=\begin{bmatrix}15^2&67.5 \\67.5&15^2\end{bmatrix}$ 
- 
-**Result:** 
-
-All Rhat values = 1, elpd_loo = -431.3, 122 k-values are between (-Inf, 0.5] (good) and 1 k-value is in (0.7, 1] (bad)
-
-**Experiment2**
-
-$\begin{bmatrix}\alpha \\\beta\end{bmatrix}=\begin{bmatrix}2 \\2\end{bmatrix}$ and $\sum=\begin{bmatrix}3^2&9 \\9&3^2\end{bmatrix}$ 
- 
-**Result:**
-All Rhat values = 1, elpd_loo = -431.7, 121 k-values are between (-Inf, 0.5] (good), 1 k-value is in (0.7, 1] (bad)
+|   | Priors                                                                               | Good k-vals | Ok k-vals | Bad k-vals | ELPD-LOO  |
+|---|--------------------------------------------------------------------------------------|-------------|-----------|------------|-----------|
+| 1 | $\sigma$ ~ gamma(1,1), $\alpha,\beta$ ~ multi_normal([10, 0], [[100,10],[10,100]]);  |         122 |         0 |          1 | -530.2663 |
+| 2 | $\sigma$ ~ gamma(4,4), $\alpha,\beta$ ~ multi_normal([50, 2], [[50,20],[20,50]]);    |         123 |         0 |          0 | -430.8007 |
+| 3 | $\sigma$ ~ gamma(0.5,0.5), $\alpha,\beta$ ~ multi_normal([5, 2], [[50,10],[10,50]]); |         122 |         0 |          1 | -475.4511 |
+| 4 | $\sigma$ ~ gamma(2,2), $\alpha,\beta$ ~ multi_normal([10, 0], [[100,5],[5,100]]);    |         122 |         0 |          1 | -531.4167 |
 
 
+### Analysis
+It appears that for the first three models, the sensitivity to the change in prior/hyper-prior is not very high, as the ELPD values don't change very strongly. For the pooled model, the sensitivity is rather higher, varying by upto 100 with the change of prior. 
 
 ## Finalized priors + Results 
 
+|         | Hyper-priors/ Priors                                                                                                                                                 | Good k-vals | Ok k-vals | Bad k-vals | ELPD-LOO  |
+|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|-----------|------------|-----------|
+| Model 1 | $\mu_\alpha$ ~ normal(0, 10), $\mu_\beta$ ~ normal(0,10), sigma_alpha ~  gamma(4, 4),   $\sigma^2_\beta$ ~ gamma(4, 4), $\sigma$ ~ gamma(4, 4)                       |         123 |         0 |          0 | -424.4974 |
+| Model 2 |   $\sigma$ ~ gamma(1,1), $\Sigma_0$ ~ lkj_corr(2),  $\sigma_s$ ~  multi_normal([0,1], [100,10],[10,100]]),  $\mu_\theta$ ~ multi_normal([10,0], [[100,10],[10,100]]) |         122 |         1 |          0 | -423.1688 |
+| Model 3 | $\sigma$ ~ gamma(0.5,0.5), $\alpha,\beta$ ~ multi_normal([5, 2], [[50,10],[10,50]]);                                                                                 |         123 |         0 |          0 | -419.4101 |
+| Model 4 | $\sigma$ ~ gamma(4,4), $\alpha,\beta$ ~ multi_normal([50, 2], [[50,20],[20,50]]);                                                                                    |         123 |         0 |          0 | -430.8007 |
 
 
 # References: 
