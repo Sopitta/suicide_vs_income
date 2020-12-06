@@ -20,8 +20,7 @@ parameters {
   real <lower=0> sigma1;
   real <lower=0> sigma2;
   real <lower=0> sigma3;
-  vector[2] mu_prior = [10, 10];
-  matrix[2, 2] cov_prior = [[100,10,10,100]];
+
 }
 
 transformed parameters {
@@ -35,9 +34,9 @@ model {
   sigma1 ~ gamma(1,1);
   sigma2 ~ gamma(1,1);
   sigma3 ~ gamma(1,1);
-  t1 ~ multi_normal(mu_prior, cov_prior);
-  t2 ~ multi_normal(mu_prior, cov_prior);
-  t3 ~ multi_normal(mu_prior, cov_prior);
+  t1 ~ multi_normal([0, 0], [[100,10],[10,100]]);
+  t2 ~ multi_normal([0, 0], [[100,10],[10,100]]);
+  t3 ~ multi_normal([0, 0], [[100,10],[10,100]]);
   
   
   for (n in 1:N1){

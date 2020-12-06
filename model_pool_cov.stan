@@ -8,8 +8,7 @@ data {
 parameters {
   vector[2] t;
   real <lower=0> sigma;
-  vector[2] mu_prior = [10, 10];
-  matrix[2, 2] cov_prior = [[100,10,10,100]];
+
 }
 
 transformed parameters {
@@ -18,7 +17,7 @@ transformed parameters {
 
 model {
   //  priors
-  t ~ multi_normal(mu_prior, cov_prior);
+  t ~ multi_normal([0, 0], [[100,10],[10,100]]);
   sigma ~ gamma(1,1);
 
   
