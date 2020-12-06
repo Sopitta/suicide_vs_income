@@ -1,0 +1,189 @@
+---
+title: "BDA Final Project - Evaluation of the relationship between mean income and suicide rate."
+author: "Anonymous"
+output: 
+  pdf_document: 
+    toc: yes
+    toc_depth: 1
+---
+
+# Introduction 
+
+## Motivation 
+
+An oft-wondered and oft-debated question for people, for as long as the concept of money has existed, is whether having money makes a person happier. While happiness is a tricky thing to quantify, extreme sadness can readily be quantified by looking at the suicide rate for a particular group of people. This brings us to the rather macabre question we have chosen to examine for this project: is there a relationship between average income and the suicide rates for groups of people? 
+
+## The problem and modelling idea
+The relationship between the mean income and the suicide rate was modeled as a linear regression problem, and this was done in three different contexts, so that we can try to get some kind of statistically sound answer to the question posed above The first context is for the 9 different broad groups of professions in the United Kingdom, sourced from the government database for the year 2019. The second is for same, but for 22 groups of professions in the United States. The final context is an international one, the suicide rates were seen for the 93 countries of the world with a population >100k, and the mean incomes for those countries found for the year 2019. In all three cases, the mean income was taken in dollars and standardized by the cost of living for the corresponding country, in order to be able to club such different data together. 
+
+# The data 
+
+Our data was not retrieved from some common source, but rather from different sources and they were adjusted so that they were coherent together.
+
+## United Kingdom data
+
+The data for both the suicide rate (per 100,000 people) and the mean weekly income (which was converted into monthly income, into dollars, and standardized by the cost of living) were both retrieved for the same 9 profession groups from UK Office for National Statistics (ons.gov.uk). The 9 occupation groups selected are 
+ 
+
+1. Managers, directors and senior officials
+2. Professional occupations
+3. Associate professional and technical occupations
+4. Administrative and secretarial occupations
+5. Skilled trades occupations
+6. Caring, leisure and other service occupations
+7. Sales and customer service occupations
+8. Process, plant and machine operatives
+9. Unskilled occupations / elementary operations
+
+
+## United States data 
+The data for the suicide rate (per 100,000 people) for 22 broad profession groups was retrieved from the Maerican Centre for Disease Control (CDC), and the mean monthly income (which was standardized by the cost of living) was retrieved for the same 22 profession groups from US Bureau of Labor Statistics (BLS). The 22 occupation groups selected are 
+
+Initializing: 
+```{r}
+library(aaltobda)
+library(rstan)
+library(shinystan)
+
+data("drowning")
+SEED <- 48927 # set random seed for reproducability
+
+```
+
+## 1.
+The corrected Stan code can be seen below
+```{r include=FALSE}
+code_drownings <- "ln2.stan"
+writeLines(readLines(code_drownings))
+```
+
+```{r}
+writeLines(readLines(code_drownings))
+```
+The three main corrections are 
+- Including the semicolon after y ~ normal(mu, sigma)
+- When sigma is declared, the constraint is defined as upper bound = 0 instead of lower bound = 0.
+- When generating the new ypred, the value of mu should be derived from transforming xpred. 
+
+## 2. 
+Through some trial and error, sigma was determined that followed the set constraint: 
+
+```{r}
+p = pnorm(c(-69,69), 0, 27); 
+round(p[2]-p[1], 2)
+
+```
+
+The chosen value is $\sigma_B = 27$
+
+## 3.
+
+The value of sig_beta is passed in as 27 and used in the prior. The prior lines for beta is the first of the model block.
+
+## 4. 
+A weakly informative prior was used for the intercept. The mean was chosen as 2000, because the x values, or the year in question, is about a similar range, while the beta values appear to be small negative values. The standard deviation was chosen as 1000, so the precision is low and the prior is staunchly uninformative.  
+
+
+```{r echo=T, results='hide'}
+data_drownings <- list(N = length(drowning$year), y = drowning$drownings, x = drowning$year, xpred = 2019, sig_beta=27)
+fit_drowning <- stan(file = code_drownings, data = data_drownings, seed = SEED)
+draws <- as.data.frame(fit_drowning)
+
+
+q_5 = drowning$year; 
+q_95 = q_5;
+q_50 = q_5;
+for (ix in 1:length(drowning$year))
+{
+        q = quantile(draws[,ix+3], c(0.05,0.5, 0.95));
+        q_5[ix] = q[1]; q_50[ix] = q[2]; q_95[ix] = q[3]; 
+}
+
+plot(drowning$year, q_50, type = "l", col = "black", ylim = c(90,210))
+lines(drowning$year, q_5, pch=22, lty=2, col = "blue")
+lines(drowning$year, q_95, pch=22, lty=2, col = "red")
+points(drowning$year, drowning$drownings)
+
+```
+
+
+
+# 2. 
+
+
+```{r}
+data("factory")
+```
+
+## Separate model
+```{r}
+file_name_separate = "machine_separate.stan"
+writeLines(readLines(file_name_separate))
+```
+```{r}
+sm_separate <- rstan::stan_model(file = file_name_separate)
+stan_data <- list(y = factory,N = nrow(factory),J = ncol(factory))
+model_separate <- rstan::sampling(sm_separate, data = stan_data)
+model_separate
+draws_separate <- as.data.frame(model_separate)
+```
+```{r}
+hist(draws_separate$`mu[6]`, main="Mean of Quality of Machine 6" )
+```
+
+```{r}
+hist(draws_separate$`ypred`, main="Predicted quality values for Machine 6" )
+```
+
+## Pooled model 
+
+
+```{r}
+file_name_pooled = "machine_pooled.stan"
+writeLines(readLines(file_name_pooled))
+```
+
+```{r}
+sm_pooled <- rstan::stan_model(file = file_name_pooled)
+factory_pooled = unlist(factory) #pooling all data
+stan_data <- list(y = factory,N = nrow(factory),J = ncol(factory_pooled))
+model_pooled <- rstan::sampling(sm_pooled, data = stan_data)
+model_pooled
+draws_pooled <- as.data.frame(model_pooled)
+```
+
+```{r}
+hist(draws_pooled$`mu[6]`, main="Mean of Quality of Machine 6" )
+```
+
+```{r}
+hist(draws_pooled$`ypred`, main="Predicted quality values for Machine 6" )
+```
+
+
+## Hierarchical model 
+
+
+```{r}
+data("factory")
+```
+
+## Separate model
+```{r}
+file_name_hier = "machine_hier.stan"
+writeLines(readLines(file_name_hier))
+```
+```{r}
+sm_hier <- rstan::stan_model(file = file_name_hier)
+stan_data <- list(y = factory,N = nrow(factory),J = ncol(factory))
+model_hier <- rstan::sampling(sm_hier, data = stan_data)
+model_hier
+draws_hier <- as.data.frame(model_hier)
+```
+```{r}
+hist(draws_hier$`mu[6]`, main="Mean of Quality of Machine 6" )
+```
+
+```{r}
+hist(draws_hier$`ypred`, main="Predicted quality values for Machine 6" )
+```
