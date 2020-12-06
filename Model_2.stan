@@ -8,6 +8,7 @@ data {
   vector[N1] x1;
   vector[N2] x2;
   vector[N3] x3;
+  real v[13];
 }
 
 parameters {
@@ -29,10 +30,10 @@ transformed parameters {
 
 
 model {
-  sigma ~ gamma(1,1); // Uninformative prior
-  sig_corr ~ lkj_corr(2); //Prior for the correlation matrix
-  sig_scale ~  multi_normal([10,10], [[100,10],[10,100]]) ; // Creating prior from uninformative hyperprior
-  mu_theta ~ multi_normal([10,10], [[100,10],[10,100]]) ; // Creating prior from uninformative hyperprior
+  sigma ~ gamma(v[1],v[2]); // Uninformative prior
+  sig_corr ~ lkj_corr(v[3]); //Prior for the correlation matrix
+  sig_scale ~  multi_normal([v[4],v[5]], [[v[6],v[7]],[v[7],v[8]]]) ; // Creating prior from uninformative hyperprior
+  mu_theta ~ multi_normal([v[9],v[10]], [[v[11],v[12]],[v[12],v[13]]]) ; // Creating prior from uninformative hyperprior
 
   theta1 ~ multi_normal(mu_theta, sig_hyp); 
   y1 ~ normal(mu1, sigma);

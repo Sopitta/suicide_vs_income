@@ -8,6 +8,7 @@ data {
   vector[N1] x1;
   vector[N2] x2;
   vector[N3] x3;
+  real v[10];
 }
 
 parameters {
@@ -30,11 +31,11 @@ transformed parameters {
 
 model {
   //  priors
-  mu_alpha ~ normal(15,15); 
-  mu_beta ~ normal(0,2); 
-  sigma_alpha ~ gamma(1,1);
-  sigma_beta ~ gamma(1,1);
-  sigma ~ gamma(1,1);
+  mu_alpha ~ normal(v[1], v[2]); 
+  mu_beta ~ normal(v[3], v[4]); 
+  sigma_alpha ~ gamma(v[5], v[6]);
+  sigma_beta ~ gamma(v[7], v[8]);
+  sigma ~ gamma(v[9], v[10]);
   
   alpha[1] ~ normal(mu_alpha, sigma_alpha); 
   beta[1] ~ normal(mu_beta, sigma_beta); 
