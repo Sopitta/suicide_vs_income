@@ -26,7 +26,9 @@ model_hier <- rstan::sampling(sm_suicide, data = stan_data, seed = 2,control=lis
 draws_hier <- as.data.frame(model_hier)
 log_lik  <- data.matrix(draws_hier[(length(draws_hier)-123):(length(draws_hier)-1)]) #Works for all models
 
-
+if(i==1) draws_hier1=draws_hier
+if(i==2) draws_hier2=draws_hier
+if(i==3) draws_hier3=draws_hier
 loo1 <- loo(log_lik)
 loo_vals[i]=loo1$estimates[1];
 k_vals[[i]] = max(loo1$diagnostics$pareto_k); 
@@ -49,6 +51,7 @@ model_hier <- rstan::sampling(sm_suicide, data = stan_data, seed = 2,control=lis
 draws_hier <- as.data.frame(model_hier)
 log_lik  <- data.matrix(draws_hier[(length(draws_hier)-123):(length(draws_hier)-1)]) #Works for all models
 
+draws_hier4=draws_hier
 
 loo1 <- loo(log_lik)
 print(loo1$estimates[1])

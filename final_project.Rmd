@@ -157,9 +157,10 @@ writeLines(readLines(file_name4))
 ```
 
 ### Running the models
-```{r} 
+```{r echo=T,  error=FALSE, message=FALSE, warning=FALSE} 
 file_names = c("Model_1.stan", "Model_2.stan", "Model_3.stan")
-
+loo_vals = list(1,2,3,4)
+k_vals = list(1,2,3,4)
 i=1;
 for(file_name in file_names)
 {sm_suicide <- rstan::stan_model(file = file_name)
@@ -169,6 +170,9 @@ model_hier <- rstan::sampling(sm_suicide, data = stan_data, seed = 2,control=lis
 
 
 draws_hier <- as.data.frame(model_hier)
+if(i==1) draws_hier1=draws_hier
+if(i==2) draws_hier2=draws_hier
+if(i==3) draws_hier3=draws_hier
 log_lik  <- data.matrix(draws_hier[(length(draws_hier)-123):(length(draws_hier)-1)]) #Works for all models
 
 
@@ -201,6 +205,7 @@ loo_vals[i]=loo1$estimates[1];
 k_vals[[i]] = max(loo1$diagnostics$pareto_k)
 print(max(loo1$diagnostics$pareto_k)); print(loo1$estimates[1])
 
+draws_hier4=draws_hier
 
 ```
 
@@ -284,6 +289,8 @@ lines(ukdata$wagepercol, mu1v[,2], col='blue')
 lines(ukdata$wagepercol, mu1v[,3], col='blue')
 ```
 
+There is a strong link between poverty and the suicide rate. 
+
 ```{r} 
 
 
@@ -293,13 +300,16 @@ for (i in c(1:22)){
   mu2v[i,2:3] = quantile(mu2[,i], c(0.025, 0.975));
 } 
 
-plot(usdata$wagepercol, usdata$suicides100k, main='UK suicide rate', xlab='Standardized income', ylab='Suicides per 100k people')
+plot(usdata$wagepercol, usdata$suicides100k, main='US suicide rate', xlab='Standardized income', ylab='Suicides per 100k people')
 lines(usdata$wagepercol, mu2v[,1])
 lines(usdata$wagepercol, mu2v[,2], col='blue')
 lines(usdata$wagepercol, mu2v[,3], col='blue')
 
 
 ```
+
+There is a weaker link between poverty and the suicide rate. 
+
 
 ```{r} 
 
@@ -311,7 +321,7 @@ for (i in c(1:93)){
   mu3v[i,2:3] = quantile(mu3[,i], c(0.025, 0.975));
 } 
 
-plot(countrydata$wagepercol, countrydata$suicides100k, main='UK suicide rate', xlab='Standardized income', ylab='Suicides per 100k people')
+plot(countrydata$wagepercol, countrydata$suicides100k, main='Suicide rate', xlab='Standardized income', ylab='Suicides per 100k people')
 lines(countrydata$wagepercol, mu3v[,1])
 lines(countrydata$wagepercol, mu3v[,2], col='blue')
 lines(countrydata$wagepercol, mu3v[,3], col='blue')
@@ -319,8 +329,64 @@ lines(countrydata$wagepercol, mu3v[,3], col='blue')
 
 ```
 
+There is an  inverse relationship between poverty and the suicide rate in the global context. 
 
 
+
+### Diagnostics: 
+
+We are only running this for the best model, Model #3
+
+Tree depth: 
+
+```{r} 
+sampler_params <- get_sampler_params(model_hier3, inc_warmup = FALSE)
+
+min_tree_depth = min(c( sampler_params[[1]][,3],  sampler_params[[2]][,3],  sampler_params[[3]][,3],  sampler_params[[4]][,3]  ))
+max_tree_depth = max(c( sampler_params[[1]][,3],  sampler_params[[2]][,3],  sampler_params[[3]][,3] ,  sampler_params[[4]][,3] ))
+
+mean_tree_depth = mean(c( sampler_params[[1]][,3],  sampler_params[[2]][,3],  sampler_params[[3]][,3] ,  sampler_params[[4]][,3] ))
+
+print(c(min_tree_depth, mean_tree_depth, max_tree_depth))
+```
+The tree-depth never exceeds 6 and hence seems to be comfortably low. 
+Divergences: 
+
+```{r} 
+
+min_div = min(c( sampler_params[[1]][,5],  sampler_params[[2]][,5],  sampler_params[[3]][,5],  sampler_params[[4]][,5]  ))
+max_div = max(c( sampler_params[[1]][,5],  sampler_params[[2]][,5],  sampler_params[[3]][,5],  sampler_params[[4]][,5]  ))
+
+mean_div = mean(c( sampler_params[[1]][,5],  sampler_params[[2]][,5],  sampler_params[[3]][,5] ,  sampler_params[[4]][,5] ))
+
+print(c(min_div, mean_div, max_div))
+```
+
+There are no divergences in the draws.
+
+Convergence as per Rhat: 
+```{r} 
+fit_summary <- summary(model_hier3)
+mean_Rhat <- mean(fit_summary[[1]][,10])
+max_Rhat <- max(fit_summary[[1]][,10])
+print(c('Mean Rhat', mean_Rhat, 'Max Rhat', max_Rhat))
+```
+
+Rhat <<1.05 indicates that the draws have converged well.
+
+Effective number of draws
+```{r} 
+mean_neff <- mean(fit_summary[[1]][,9])
+min_neff <- min(fit_summary[[1]][,9])
+print(c('Mean N_eff', mean_neff, 'Min N_eff', min_neff))
+```
+
+While the minimum N_eff is 1700, the mean is very close to 4000 indicating a good fit and succesful MCSM. 
+From the given diagnostics, it is clear that the model has converged nicely! 
+
+### Conclusion
+
+It appears from the likelihood values, that the model that fits our data the best is the Separated model. this could be because of the very different trends in our three data contexts. In the UK profession context, poverty does very much seem linked to the suicide rate, but then the trend is less strong in the US context, and it is actually the opposite in the global context. This could be because of the unaccounted cultural and sociopolitical factors in a global scope, as discussed earlier. 
 
 # References: 
 [1] Qin, Ping, Esben Agerbo, and Preben Bo Mortensen. "Suicide risk in relation to socioeconomic, demographic, psychiatric, and familial factors: a national register–based study of all suicides in Denmark, 1981–1997." American journal of psychiatry 160.4 (2003): 765-772.
