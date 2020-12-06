@@ -156,6 +156,56 @@ writeLines(readLines(file_name4))
 
 ```
 
+### Running the models
+```{r} 
+file_names = c("Model_1.stan", "Model_2.stan", "Model_3.stan")
+
+i=1;
+for(file_name in file_names)
+{sm_suicide <- rstan::stan_model(file = file_name)
+
+stan_data <- list(y1 = ukdata$suicides100k, x1=ukdata$wagepercol, N1 = length(ukdata$wagepercol), y2 = usdata$suicides100k, x2=usdata$wagepercol, N2 = length(usdata$wagepercol), y3 = countrydata$suicides100k, x3=countrydata$wagepercol, N3 = length(countrydata$wagepercol))
+model_hier <- rstan::sampling(sm_suicide, data = stan_data, seed = 2,control=list(adapt_delta=0.95))
+
+
+draws_hier <- as.data.frame(model_hier)
+log_lik  <- data.matrix(draws_hier[(length(draws_hier)-123):(length(draws_hier)-1)]) #Works for all models
+
+
+loo1 <- loo(log_lik)
+loo_vals[i]=loo1$estimates[1];
+k_vals[[i]] = max(loo1$diagnostics$pareto_k); 
+print(max(loo1$diagnostics$pareto_k)); print(loo1$estimates[1]);
+i=i+1;
+
+
+
+}
+###################4k_vals
+model_hier3 = model_hier; 
+file_name = "Model_4.stan"
+
+sm_suicide <- rstan::stan_model(file = file_name)
+
+stan_data <- list(y = c(ukdata$suicides100k, usdata$suicides100k, countrydata$suicides100k), x=c(ukdata$wagepercol, usdata$wagepercol, countrydata$wagepercol), N = 124)
+model_hier <- rstan::sampling(sm_suicide, data = stan_data, seed = 2,control=list(adapt_delta=0.95))
+
+
+draws_hier <- as.data.frame(model_hier)
+log_lik  <- data.matrix(draws_hier[(length(draws_hier)-123):(length(draws_hier)-1)]) #Works for all models
+
+
+loo1 <- loo(log_lik)
+print(loo1$estimates[1])
+loo_vals[i]=loo1$estimates[1];
+k_vals[[i]] = max(loo1$diagnostics$pareto_k)
+print(max(loo1$diagnostics$pareto_k)); print(loo1$estimates[1])
+
+
+```
+
+
+
 ## Sensitivity analysis
 
 ### Model 1: Hierarchical model, uncorrelated parameters
@@ -210,6 +260,66 @@ It appears that for the first three models, the sensitivity to the change in pri
 | Model 2 |   $\sigma$ ~ gamma(1,1), $\Sigma_0$ ~ lkj_corr(2),  $\sigma_s$ ~  multi_normal([0,1], [100,10],[10,100]]),  $\mu_\theta$ ~ multi_normal([10,0], [[100,10],[10,100]]) |         122 |         1 |          0 | -423.1688 |
 | Model 3 | $\sigma$ ~ gamma(0.5,0.5), $\alpha,\beta$ ~ multi_normal([5, 2], [[50,10],[10,50]]);                                                                                 |         123 |         0 |          0 | -419.4101 |
 | Model 4 | $\sigma$ ~ gamma(4,4), $\alpha,\beta$ ~ multi_normal([50, 2], [[50,20],[20,50]]);                                                                                    |         123 |         0 |          0 | -430.8007 |
+
+## Plotting results for the best model 
+
+The best model, accordings to these results is Model 3, with separate models.
+
+```{r} 
+
+list_of_draws <- extract(model_hier3)
+mu1 = list_of_draws$mu1;
+mu2 = list_of_draws$mu2;
+mu3 = list_of_draws$mu3
+
+mu1v = matrix(1:27,ncol=3) 
+for (i in c(1:9)){
+  mu1v[i,1] = mean(mu1[,i]);
+  mu1v[i,2:3] = quantile(mu1[,i], c(0.025, 0.975));
+} 
+
+plot(ukdata$wagepercol, ukdata$suicides100k, ylim=c(0,22), main='UK suicide rate', xlab='Standardized income', ylab='Suicides per 100k people');
+lines(ukdata$wagepercol, mu1v[,1])
+lines(ukdata$wagepercol, mu1v[,2], col='blue')
+lines(ukdata$wagepercol, mu1v[,3], col='blue')
+```
+
+```{r} 
+
+
+mu2v = matrix(1:66,ncol=3) 
+for (i in c(1:22)){
+  mu2v[i,1] = mean(mu2[,i]);
+  mu2v[i,2:3] = quantile(mu2[,i], c(0.025, 0.975));
+} 
+
+plot(usdata$wagepercol, usdata$suicides100k, main='UK suicide rate', xlab='Standardized income', ylab='Suicides per 100k people')
+lines(usdata$wagepercol, mu2v[,1])
+lines(usdata$wagepercol, mu2v[,2], col='blue')
+lines(usdata$wagepercol, mu2v[,3], col='blue')
+
+
+```
+
+```{r} 
+
+
+
+mu3v = matrix(1:279,ncol=3) 
+for (i in c(1:93)){
+  mu3v[i,1] = mean(mu3[,i]);
+  mu3v[i,2:3] = quantile(mu3[,i], c(0.025, 0.975));
+} 
+
+plot(countrydata$wagepercol, countrydata$suicides100k, main='UK suicide rate', xlab='Standardized income', ylab='Suicides per 100k people')
+lines(countrydata$wagepercol, mu3v[,1])
+lines(countrydata$wagepercol, mu3v[,2], col='blue')
+lines(countrydata$wagepercol, mu3v[,3], col='blue')
+
+
+```
+
+
 
 
 # References: 

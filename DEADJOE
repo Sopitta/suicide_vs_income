@@ -1,0 +1,27 @@
+
+*** These modified files were found in JOE when it aborted on Sun Dec  6 23:11:21 2020
+*** JOE was aborted by UNIX signal 1
+
+*** File '/m/home/home7/75/ranjitm1/data/Downloads/bda/suicide_v_income/.git/COMMIT_EDITMSG'
+:q
+:
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch master
+# Your branch is up to date with 'origin/master'.
+#
+# Changes to be committed:
+#	modified:   final_project.Rmd
+#	modified:   suicides_testing_models.R
+#
+
+*** File '(Unnamed)'
+/m/home/home7/75/ranjitm1/data/Documents/thesis_labcomp/dithered_codec/dithered_codec_master/dithered_codec/.git/COMMIT_EDITMSG
+/m/home/home7/75/ranjitm1/data/Downloads/bda/suicide_v_income/.git/COMMIT_EDITMSG
+
+*** File '* Startup Log *'
+Processing '/etc/joe/editorrc'...
+Processing '/etc/joe/ftyperc'...
+Finished processing /etc/joe/ftyperc
+Finished processing /etc/joe/editorrc

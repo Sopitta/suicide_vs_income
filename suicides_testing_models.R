@@ -28,15 +28,15 @@ log_lik  <- data.matrix(draws_hier[(length(draws_hier)-123):(length(draws_hier)-
 
 
 loo1 <- loo(log_lik)
-print(loo1$estimates[1])
-loo_vals[i]=loo1;
-k_vals[i] = max(loo1$diagnostics$pareto_k); 
+loo_vals[i]=loo1$estimates[1];
+k_vals[[i]] = max(loo1$diagnostics$pareto_k); 
 i=i+1;
 
 
 
 }
 ###################4k_vals
+model_hier3 = model_hier; 
 
 file_name = "Model_4.stan"
 
@@ -52,5 +52,45 @@ log_lik  <- data.matrix(draws_hier[(length(draws_hier)-123):(length(draws_hier)-
 
 loo1 <- loo(log_lik)
 print(loo1$estimates[1])
-loo_vals[i]=loo1
-k_vals[i] = max(loo1$diagnostics$pareto_k)
+loo_vals[i]=loo1$estimates[1];
+k_vals[[i]] = max(loo1$diagnostics$pareto_k); 
+
+
+list_of_draws <- extract(model_hier3)
+mu1 = list_of_draws$mu1;
+mu2 = list_of_draws$mu2;
+mu3 = list_of_draws$mu3
+
+mu1v = matrix(1:27,ncol=3) 
+for (i in c(1:9)){
+  mu1v[i,1] = mean(mu1[,i]);
+  mu1v[i,2:3] = quantile(mu1[,i], c(0.025, 0.975));
+} 
+
+plot(ukdata$wagepercol, ukdata$suicides100k, ylim=c(0,22))
+lines(ukdata$wagepercol, mu1v[,1])
+lines(ukdata$wagepercol, mu1v[,2], col='blue')
+lines(ukdata$wagepercol, mu1v[,3], col='blue')
+
+mu2v = matrix(1:66,ncol=3) 
+for (i in c(1:22)){
+  mu2v[i,1] = mean(mu2[,i]);
+  mu2v[i,2:3] = quantile(mu2[,i], c(0.025, 0.975));
+} 
+
+plot(usdata$wagepercol, usdata$suicides100k)
+lines(usdata$wagepercol, mu2v[,1])
+lines(usdata$wagepercol, mu2v[,2], col='blue')
+lines(usdata$wagepercol, mu2v[,3], col='blue')
+
+
+mu3v = matrix(1:279,ncol=3) 
+for (i in c(1:93)){
+  mu3v[i,1] = mean(mu3[,i]);
+  mu3v[i,2:3] = quantile(mu3[,i], c(0.025, 0.975));
+} 
+
+plot(countrydata$wagepercol, countrydata$suicides100k, ylim=c(0,22))
+lines(countrydata$wagepercol, mu3v[,1])
+lines(countrydata$wagepercol, mu3v[,2], col='blue')
+lines(countrydata$wagepercol, mu3v[,3], col='blue')
