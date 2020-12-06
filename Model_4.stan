@@ -3,6 +3,7 @@ data {
   int <lower=0> N;
   vector[N] y;
   vector[N] x;
+  real v[7];
 }
 
 parameters {
@@ -17,8 +18,8 @@ transformed parameters {
 
 model {
   //  priors
-  t ~ multi_normal([0, 0], [[100,10],[10,100]]);
-  sigma ~ gamma(1,1);
+  t ~ multi_normal([v[1], v[2]], [[v[3],v[4]],[v[4],v[5]]]);
+  sigma ~ gamma(v[6],v[7]);
 
   
   for (n in 1:N){

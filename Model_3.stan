@@ -9,7 +9,7 @@ data {
   vector[N1] x1;
   vector[N2] x2;
   vector[N3] x3;
-
+  real v[7];
  
 }
 
@@ -31,12 +31,12 @@ transformed parameters {
 
 model {
   //  priors
-  sigma1 ~ gamma(1,1);
-  sigma2 ~ gamma(1,1);
-  sigma3 ~ gamma(1,1);
-  t1 ~ multi_normal([0, 0], [[100,10],[10,100]]);
-  t2 ~ multi_normal([0, 0], [[100,10],[10,100]]);
-  t3 ~ multi_normal([0, 0], [[100,10],[10,100]]);
+  sigma1 ~ gamma(v[1],v[2]);
+  sigma2 ~ gamma(v[1],v[2]);
+  sigma3 ~ gamma(v[1],v[2]);
+  t1 ~ multi_normal([v[3], v[4]], [[v[5],v[6]],[v[6],v[7]]]);
+  t2 ~ multi_normal([v[3], v[4]], [[v[5],v[6]],[v[6],v[7]]]);
+  t3 ~ multi_normal([v[3], v[4]], [[v[5],v[6]],[v[6],v[7]]]);
   
   
   for (n in 1:N1){
