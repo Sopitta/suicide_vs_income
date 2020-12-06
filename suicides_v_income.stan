@@ -30,8 +30,8 @@ transformed parameters {
 
 model {
   //  priors
-  mu_alpha ~ normal(0,50); 
-  mu_beta ~ normal(0,50); 
+  mu_alpha ~ normal(15,15); 
+  mu_beta ~ normal(0,2); 
   sigma_alpha ~ gamma(1,1);
   sigma_beta ~ gamma(1,1);
   sigma ~ gamma(1,1);
