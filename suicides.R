@@ -13,7 +13,7 @@ countrydata =read.csv('countrydata.csv')
 loo_vals = integer(9)
 k_vals = integer(9)
 
-file_names = c("suicides_v_income.stan", "suicides_v_income_1.stan", "suicides_v_income_2.stan", "suicides_v_income_cov.stan", "suicides_v_income_cov2.stan", "separate_model_1.stan", "separate_model_cov.stan"  )
+file_names = c("model_1.stan", "suicides_v_income_1.stan", "suicides_v_income_2.stan", "model_2.stan", "suicides_v_income_cov2.stan", "separate_model_1.stan", "Model_3.stan"  )
 
 #file_name = "suicides_v_income.stan"
 #file_name = "separate_model_1.stan"
@@ -56,7 +56,7 @@ loo_vals[i]=loo1
 k_vals[i] = max(loo1$diagnostics$pareto_k)
 i=i+1;
 
-file_name = "model_pool_cov.stan"
+file_name = "Model_4.stan"
 
 sm_suicide <- rstan::stan_model(file = file_name)
 

@@ -95,7 +95,7 @@ First, hierarchical models are tested. A common $\sigma^2$ is used for all three
 
 The second kind of hierarchical model assumes that there is a correlation between $\alpha$ and $\beta$ and therefore the hyperpriors for the two have a vector $\mu$ and a covariance matrix $\Sigma$. Generation of a covariance priors from the hyperpriors requires the separate generation of the correlation matrix $\Sigma_0$ (using the LKJ correlation distribution) and the scaling factor $\sigma_\alpha$ and $\sigma_\beta$. A diagonal matrix D is generated from the two $\sigma$s, and then the covariance matrix is obtained as a transformed parameter as $\Sigma = D\times\Sigma_0\times D$. This model is depicted in the second figure below.
 
-The two hierarchical models are compared with both pooled and separate models, which have priors defined for $\alpha$ and $\beta$ as well as for $\sigma^2$. For the pooled model, a single estimate is made for $\alpha$, $\beta$ and for $\sigma^2$ on combining the data from all three contexts. For the separate model, three completely separate estimates are made for each of the contexts for $\alpha$, $\beta$ and for $\sigma^2$. The model layout for both pooled and separate modes look similar, and is depicted as the third figure below. 
+The two hierarchical models explained above are compared with both pooled and separate models, which have priors defined for $\alpha$ and $\beta$ as well as for $\sigma^2$, and also assumes correlation between $\alpha$ and $\beta$. For the pooled model, a single estimate is made for $\alpha$, $\beta$ and for $\sigma^2$ on combining the data from all three contexts. For the separate model, three completely separate estimates are made for each of the contexts for $\alpha$, $\beta$ and for $\sigma^2$. The model layout for both pooled and separate modes look similar, and is depicted as the third figure below. 
 
 ![First Hierarchical model](hier-separate-alphabeta.png){width=200px} ![Second Hierarchical model](hier_cov-singlesig.png){width=200px} ![Separate and pooled models](hier-separate-pool.png){width=200px}
 
@@ -104,15 +104,61 @@ The two hierarchical models are compared with both pooled and separate models, w
 
 To summarize, the four models tested are: 
 
-- Hierarchical model with uncorrelated $\alpha$ and $\beta$ (Figure 1)
-- Hierarchical model with correlated $\alpha$ and $\beta$. (Figure 2)
-- Separate model (Figure 3)
-- Pooled model (Figure 3)
+- Model 1: Hierarchical model with uncorrelated $\alpha$ and $\beta$ (Figure 1)
+- Model 2: Hierarchical model with correlated $\alpha$ and $\beta$. (Figure 2)
+- Model 3: Separate model with correlated $\alpha$ and $\beta$. (Figure 3)
+- Model 4: Pooled model with correlated $\alpha$ and $\beta$. (Figure 3)
 
+## Stan code 
+
+The Stan code for all of the three models are presented below
+
+Initializing 
+```{r echo=T, results='hide', error=FALSE, message=FALSE, warning=FALSE} 
+library(loo)
+library(rstan)
+library(shinystan)
+
+SEED <- 2 # set random seed for reproducability
+
+```
+### Model 1: Hierarchical model
+
+```{r} 
+file_name1 = "Model_1.stan"
+writeLines(readLines(file_name1))
+
+```
+
+### Model 2: Hierarchical model with correlated parameters
+
+```{r} 
+file_name2 = "Model_2.stan"
+writeLines(readLines(file_name2))
+
+```
+
+
+### Model 3: Separate model
+
+```{r} 
+file_name3 = "Model_3.stan"
+writeLines(readLines(file_name3))
+
+```
+
+
+### Model 4: Pooled model
+
+```{r} 
+file_name4 = "Model_4.stan"
+writeLines(readLines(file_name4))
+
+```
 
 ## Sensitivity analysis
 
-### Separate model
+### Model 3: Separate model
 
 To test the prior sensitivity, we change $\alpha$ and $\beta$ prior as following
 
@@ -131,7 +177,7 @@ $\begin{bmatrix}\alpha \\\beta\end{bmatrix}=\begin{bmatrix}2 \\2\end{bmatrix}$ a
 **Result:**
 All Rhat values = 1, elpd_loo = -401.4, 121 k-values are between (-Inf, 0.5] (good),1 k-value is in  (0.5, 0.7] and 1 k-value is in (0.7, 1] (bad)
 
-### Pool model
+### Model 4: Pooled model
 
 To test the prior sensitivity, we change $\alpha$ and $\beta$ prior as following
 
@@ -152,6 +198,7 @@ All Rhat values = 1, elpd_loo = -431.7, 121 k-values are between (-Inf, 0.5] (go
 
 
 
+## Finalized priors + Results 
 
 
 
