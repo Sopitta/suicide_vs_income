@@ -24,6 +24,9 @@ model_hier <- rstan::sampling(sm_suicide, data = stan_data, seed = 2,control=lis
 
 
 draws_hier <- as.data.frame(model_hier)
+if(i==1) model_hier1=model_hier;
+if(i==2) model_hier2=model_hier;
+if(i==3) model_hier3=model_hier;
 log_lik  <- data.matrix(draws_hier[(length(draws_hier)-123):(length(draws_hier)-1)]) #Works for all models
 
 if(i==1) draws_hier1=draws_hier
@@ -52,6 +55,7 @@ draws_hier <- as.data.frame(model_hier)
 log_lik  <- data.matrix(draws_hier[(length(draws_hier)-123):(length(draws_hier)-1)]) #Works for all models
 
 draws_hier4=draws_hier
+model_hier4=model_hier;
 
 loo1 <- loo(log_lik)
 print(loo1$estimates[1])
