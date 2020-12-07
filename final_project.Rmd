@@ -157,7 +157,7 @@ writeLines(readLines(file_name4))
 ```
 
 ### Running the models
-```{r echo=T,  error=FALSE, message=FALSE, warning=FALSE} 
+```{r echo=T,  results='hide', error=FALSE, message=FALSE, warning=FALSE} 
 file_names = c("Model_1.stan", "Model_2.stan", "Model_3.stan")
 loo_vals = list(1,2,3,4)
 k_vals = list(1,2,3,4)
@@ -212,6 +212,7 @@ draws_hier4=draws_hier
 
 
 ## Sensitivity analysis
+The kind of priors chosen by us for sensitivity analysis are all different kinds of proper, uninformative priors. That is because, this being a regression problem, there weren't any informative priors we could readily use. The use of the hierarchical model allows the models to developed a shared common prior, but it remains to be seen how useful that would be. The final chosen priors are given below the sensitivity analysis, with the corresponding result. 
 
 ### Model 1: Hierarchical model, uncorrelated parameters
 
@@ -266,9 +267,12 @@ It appears that for the first three models, the sensitivity to the change in pri
 | Model 3 | $\sigma$ ~ gamma(0.5,0.5), $\alpha,\beta$ ~ multi_normal([5, 2], [[50,10],[10,50]]);                                                                                 |         123 |         0 |          0 | -419.4101 |
 | Model 4 | $\sigma$ ~ gamma(4,4), $\alpha,\beta$ ~ multi_normal([50, 2], [[50,20],[20,50]]);                                                                                    |         123 |         0 |          0 | -430.8007 |
 
+It appears that the performance of all 4 models are very much comparable. The differing trends between the three contexts might be what lead the hierarchical models to perform rather poorly - the separated models emerges as the best option. The worst option with the lowest ELPD is the pooled model, which makes sense considering how different our three contexts are. 
+
 ## Plotting results for the best model 
 
-The best model, accordings to these results is Model 3, with separate models.
+The ELPD values obtained are >-400, being not very high and indicating an imperfect fit of the data. We are unsure of what kind of values would indicate a good fit, but we just chose the ones that the best amongst what we had. 
+The best model, accordings to these results is Model 3, with separate models. This could be because the trends in all three contexts are quite different, and hence there is little benefit derived in trying to analyse them together.
 
 ```{r} 
 
@@ -381,14 +385,20 @@ min_neff <- min(fit_summary[[1]][,9])
 print(c('Mean N_eff', mean_neff, 'Min N_eff', min_neff))
 ```
 
-While the minimum N_eff is 1700, the mean is very close to 4000 indicating a good fit and succesful MCSM. 
+While the minimum N_eff is 1700, the mean is about 3800 indicating a good fit and succesful MCSM. 
 From the given diagnostics, it is clear that the model has converged nicely! 
 
 ### Conclusion
 
 It appears from the likelihood values, that the model that fits our data the best is the Separated model. this could be because of the very different trends in our three data contexts. In the UK profession context, poverty does very much seem linked to the suicide rate, but then the trend is less strong in the US context, and it is actually the opposite in the global context. This could be because of the unaccounted cultural and sociopolitical factors in a global scope, as discussed earlier. 
+Since the ELPD values weren't very high, we can maybe conclude that the models we have designed aren't doing a great job with the data. It is difficult to estimate as we don't know what a reasonable value would be. 
 
-# References: 
+
+### Reflections 
+
+This is the first bayesian data analysis project for both of us where we modelled real-world data that we assembled ourselves. We have gained better undertstanding of each model type, Stan functions, model comparison, and most importantly, learned to construct a data analysis project from the start as a team. An interesting lesson we learned is that complicated models may not necessarily be the best one for a given application. In this project, the simple separate model triumphed over the complicated hierarchial models with correlated hyper-priors (someething that required a lot of research for us to figure out how to implement.) Also it was the first time we had looked under the hood at many diagnostics, and that was interesting to us as well. 
+
+# References:  
 [1] Qin, Ping, Esben Agerbo, and Preben Bo Mortensen. "Suicide risk in relation to socioeconomic, demographic, psychiatric, and familial factors: a national register–based study of all suicides in Denmark, 1981–1997." American journal of psychiatry 160.4 (2003): 765-772.
 
 [2] Lee, Sang-Uk, et al. "Suicide rates across income levels: retrospective cohort data on 1 million participants collected between 2003 and 2013 in South Korea." Journal of epidemiology 27.6 (2017): 258-264.
